@@ -1,15 +1,13 @@
 from flask import Flask, jsonify, request
-
 import sqlite3
+import re
 
 app = Flask(__name__)
 
-
 def init_db():
-    # sqlite3 crie o aquivo database.db e se conecte a variavel conn (connection)
     with sqlite3.connect("database.db") as conn:
         conn.execute("""
-                     CREATE TABLE IF NOT EXISTS LIVORS(
+                     CREATE TABLE IF NOT EXISTS LIVROS(
                      id INTEGER PRIMARY KEY AUTOINCREMENT,
                      titulo TEXT NOT NULL,
                      categoria TEXT NOT NULL,
@@ -18,25 +16,56 @@ def init_db():
                      );
         """)
 
+@app.before_request
+def before_first_request():
+    init_db()
 
 @app.route("/doar", methods=["POST"])
 def doar():
     dados = request.get_json()
 
-    titulo = dados.get("titulo")
-    categoria = dados.get("categoria")
-    autor = dados.get("autor")
-    imagem_url = dados("imagem_url")
+    if not dados:
+        return jsonify({"erro": "Nenhum dado foi fornecido"}), 400
+    
+    campos_obrigatorios = ["titulo", "categoria", "autor", "imagem_url"]
 
-    with sqlite3.connect("database.db") as conn:
-        conn.execute(f"""
-    INSERT INTO LIVROS (titulo, categoria, autor, imagem_url)
-    VALUES ("{titulo}", "{categoria}", "{autor}", "{imagem_url}")
-""")
-    conn.commit()
+    campos_faltantes = [
+        campo for campo in campos_obrigatorios if not dados.get(campo) or not str(dados.get(campo)).strip()]
 
-    return jsonify({"mensagem": "Livro cadastrado com sucesso"}), 201
+    if campos_faltantes:
+        return jsonify ({
+            "erro": "Campos obrigatórios não fornecidos ou estão vazios",
+            "campos_faltantes": campos_faltantes
+        }), 400
 
+    titulo = dados["titulo"].strip()
+    categoria = dados["categoria"].strip()  
+    autor = dados["autor"].strip()
+    imagem_url = dados["imagem_url"].strip()
+
+    if not re.match(r'^https?://[^\s]+$', imagem_url):
+        return jsonify({"erro": "URL da imagem inválida"}), 400
+    
+    try:
+        with sqlite3.connect("database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+INSERT INTO LIVROS (titulo, categoria, autor, imagem_url)
+                           VALUES (?,?,?,?)
+""", (titulo, categoria, autor, imagem_url))
+            conn.commit()
+        return jsonify({
+            "mensagem": "Livro cadastrado com sucesso",
+            "livro": {
+                "titulo": titulo,
+                "categoria": categoria,
+                "autor": autor,
+                "imagem_url": imagem_url
+            }
+        }), 201
+    
+    except sqlite3.Error as e:
+        return jsonify({"erro": "Erro ao cadastrar livro", "detalhe": str(e)}), 500
 
 if __name__ == "__main__":
     init_db()
