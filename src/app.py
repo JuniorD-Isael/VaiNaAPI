@@ -13,7 +13,7 @@ def init_db():
                      titulo TEXT NOT NULL,
                      categoria TEXT NOT NULL,
                      autor TEXT NOT NULL,
-                     imagem_url TEXT NOT NULL
+                     image_url TEXT NOT NULL
                      );
         """)
 
@@ -35,7 +35,7 @@ def doar():
     if not dados:
         return jsonify({"erro": "Nenhum dado foi fornecido"}), 400
 
-    campos_obrigatorios = ["titulo", "categoria", "autor", "imagem_url"]
+    campos_obrigatorios = ["titulo", "categoria", "autor", "image_url"]
 
     campos_faltantes = [
         campo
@@ -54,9 +54,9 @@ def doar():
     titulo = dados["titulo"].strip()
     categoria = dados["categoria"].strip()
     autor = dados["autor"].strip()
-    imagem_url = dados["imagem_url"].strip()
+    image_url = dados["image_url"].strip()
 
-    if not re.match(r"^https?://[^\s]+$", imagem_url):
+    if not re.match(r"^https?://[^\s]+$", image_url):
         return jsonify({"erro": "URL da imagem inválida"}), 400
 
     try:
@@ -64,10 +64,10 @@ def doar():
             cursor = conn.cursor()
             cursor.execute(
                 """
-INSERT INTO LIVROS (titulo, categoria, autor, imagem_url)
+INSERT INTO LIVROS (titulo, categoria, autor, image_url)
                            VALUES (?,?,?,?)
 """,
-                (titulo, categoria, autor, imagem_url),
+                (titulo, categoria, autor, image_url),
             )
             conn.commit()
         return jsonify(
@@ -77,7 +77,7 @@ INSERT INTO LIVROS (titulo, categoria, autor, imagem_url)
                     "titulo": titulo,
                     "categoria": categoria,
                     "autor": autor,
-                    "imagem_url": imagem_url,
+                    "image_url": image_url,
                 },
             }
         ), 201
@@ -93,7 +93,7 @@ def listar_livros():
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT id, titulo, categoria, autor, imagem_url
+                SELECT id, titulo, categoria, autor, image_url
                 FROM LIVROS
             """)
             livros = cursor.fetchall()
