@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
 import sqlite3
 import re
 
@@ -21,6 +21,11 @@ def init_db():
 @app.before_request
 def before_first_request():
     init_db()
+
+
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 
 @app.route("/doar", methods=["POST"])

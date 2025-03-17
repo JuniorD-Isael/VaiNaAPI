@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VaiNaAPI - Documentação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        h2 {
+            color: #333;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>VaiNaAPI - Documentação</h1>
+
+    <h2>Descrição</h2>
+    <p>VaiNaAPI é uma API REST simples para gerenciamento de livros, desenvolvida com Flask e SQLite. Permite cadastrar novos livros e consultar livros existentes no sistema.</p>
+
+    <h2>Requisitos</h2>
+    <ul>
+        <li>Python 3.13 ou superior</li>
+        <li>Dependências listadas em <code>requirements.txt</code> ou <code>pyproject.toml</code></li>
+    </ul>
+
+    <h2>Instalação</h2>
+
+    <h3>Usando pip</h3>
+    <ol>
+        <li>Clone o repositório ou baixe os arquivos da API.</li>
+        <li>Crie um ambiente virtual:
+            <pre><code>python3 -m venv venv</code></pre>
+        </li>
+        <li>Ative o ambiente virtual:
+            <pre><code>source venv/bin/activate (Linux/Mac)</code></pre>
+            <pre><code>venv\Scripts\activate (Windows)</code></pre>
+        </li>
+        <li>Instale as dependências com o pip:
+            <pre><code>pip install -r requirements.txt</code></pre>
+        </li>
+    </ol>
+
+    <h3>Usando Poetry</h3>
+    <ol>
+        <li>Clone o repositório ou baixe os arquivos da API.</li>
+        <li>Instale as dependências com o Poetry:
+            <pre><code>poetry install</code></pre>
+        </li>
+    </ol>
+
+    <h2>Configuração</h2>
+    <p>Nenhuma configuração adicional é necessária. O banco de dados SQLite (<code>database.db</code>) será criado automaticamente na primeira execução.</p>
+
+    <h2>Execução</h2>
+    <p>A API estará disponível em <code>http://127.0.0.1:5000</code></p>
+
+    <h2>Endpoints</h2>
+
+    <h3>Home</h3>
+    <p><strong>URL:</strong> /</p>
+    <p><strong>Método:</strong> GET</p>
+    <p><strong>Descrição:</strong> Página inicial com informações básicas sobre a API.</p>
+
+    <h3>Cadastrar Livro</h3>
+    <p><strong>URL:</strong> /doar</p>
+    <p><strong>Método:</strong> POST</p>
+    <p><strong>Descrição:</strong> Cadastra um novo livro no sistema.</p>
+
+    <h4>Body (JSON):</h4>
+    <pre><code>
+{
+  "titulo": "Título do livro",
+  "categoria": "Categoria do livro",
+  "autor": "Nome do autor",
+  "imagem_url": "https://url-da-imagem.com"
+}
+    </code></pre>
+
+    <h4>Respostas:</h4>
+    <ul>
+        <li>201 Created: Livro cadastrado com sucesso</li>
+        <li>400 Bad Request: Dados inválidos ou incompletos</li>
+        <li>500 Internal Server Error: Erro ao acessar o banco de dados</li>
+    </ul>
+
+    <h3>Listar Livros</h3>
+    <p><strong>URL:</strong> /livros</p>
+    <p><strong>Método:</strong> GET</p>
+    <p><strong>Descrição:</strong> Retorna todos os livros cadastrados no sistema.</p>
+
+    <h4>Respostas:</h4>
+    <ul>
+        <li>200 OK: Lista de livros retornada com sucesso</li>
+        <li>500 Internal Server Error: Erro ao acessar o banco de dados</li>
+    </ul>
+
+    <h2>Estrutura do Banco de Dados</h2>
+    <p><strong>Tabela:</strong> LIVROS</p>
+
+    <table border="1">
+        <tr><th>Caso</th><th>Campo</th><th>Tipo</th><th>Descrição</th></tr>
+        <tr><td>1</td><td>id</td><td>INTEGER</td><td>ID do livro (chave primária)</td></tr>
+        <tr><td>2</td><td>titulo</td><td>TEXT</td><td>Título do livro</td></tr>
+        <tr><td>3</td><td>categoria</td><td>TEXT</td><td>Categoria do livro</td></tr>
+        <tr><td>4</td><td>autor</td><td>TEXT</td><td>Nome do autor</td></tr>
+        <tr><td>5</td><td>imagem_url</td><td>TEXT</td><td>URL da imagem de capa</td></tr>
+    </table>
+
+    <h2>Validações</h2>
+    <ul>
+        <li>Todos os campos são obrigatórios.</li>
+        <li>A URL da imagem deve começar com <code>http://</code> ou <code>https://</code>.</li>
+    </ul>
+
+    <h2>Exemplos de Uso</h2>
+
+    <h3>Cadastrar um livro</h3>
+    <pre><code>
+POST /doar
+Content-Type: application/json
+{
+  "titulo": "O Senhor dos Anéis",
+  "categoria": "Fantasia",
+  "autor": "J.R.R. Tolkien",
+  "imagem_url": "https://example.com/capa.jpg"
+}
+    </code></pre>
+
+    <h4>Resposta:</h4>
+    <pre><code>
+{
+  "mensagem": "Livro cadastrado com sucesso",
+  "livro": {
+    "titulo": "O Senhor dos Anéis",
+    "categoria": "Fantasia",
+    "autor": "J.R.R. Tolkien",
+    "imagem_url": "https://example.com/capa.jpg"
+  }
+}
+    </code></pre>
+
+    <h3>Listar todos os livros</h3>
+    <pre><code>
+GET /livros
+    </code></pre>
+
+    <h4>Resposta:</h4>
+    <pre><code>
+{
+  "livros": [
+    {
+      "id": 1,
+      "titulo": "O Senhor dos Anéis",
+      "categoria": "Fantasia",
+      "autor": "J.R.R. Tolkien",
+      "imagem_url": "https://example.com/capa.jpg"
+    }
+  ]
+}
+    </code></pre>
+</body>
+</html>
