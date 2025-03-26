@@ -3,8 +3,11 @@ import sqlite3
 import re
 import os
 import logging
+from flask_cors import CORS
 
 app = Flask(__name__)
+
+CORS(app)
 
 db_path = os.getenv("DB_PATH", "database.db")
 logging.basicConfig(level=logging.INFO)
